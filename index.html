@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>DCA Ladder</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color:#111827;background:#f3f4f6}
+*{box-sizing:border-box}body{margin:0;background:#f3f4f6}main{max-width:640px;margin:auto;padding:calc(16px + env(safe-area-inset-top)) 15px calc(28px + env(safe-area-inset-bottom))}
+h1{font-size:30px;margin:0 0 3px;font-weight:800}.sub{color:#6b7280;margin-bottom:15px}
+.card{background:#fff;border-radius:18px;padding:16px;margin:11px 0;box-shadow:0 2px 12px #0000000b}
+h2{font-size:18px;margin:0 0 12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.triple{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+label{display:block;font-size:12px;font-weight:800;color:#6b7280;margin:11px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+input,select{width:100%;font:inherit;font-size:17px;padding:12px;border:1px solid #d1d5db;border-radius:12px;background:#fff}
+.segment{display:grid;grid-template-columns:1fr 1fr;background:#eef0f2;border-radius:12px;padding:3px;margin-bottom:8px}.segment button{margin:0;background:transparent;color:#4b5563;padding:9px;font-s[...]
+.stat{padding:12px;border-radius:13px;background:#f3f4f6}.stat b{display:block;font-size:20px;margin-top:3px}.small{font-size:12px;color:#6b7280}
+.entry{border:1px solid #e5e7eb;border-radius:15px;padding:13px;margin:9px 0}.entry.next{border:2px solid #111827}
+.entryhead{display:flex;justify-content:space-between;align-items:center}.badge{font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:#e5e7eb}.next .badge{background:#111827;co[...]
+.amount{font-size:24px;font-weight:800}.price{font-size:18px;font-weight:750}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.muted{color:#6b7280}
+button{width:100%;border:0;border-radius:13px;padding:13px;font:inherit;font-weight:800;background:#111827;color:#fff;margin-top:9px}.secondary{background:#e5e7eb;color:#111827}.danger{background:#fee[...]
+.notice{padding:11px;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:12px;margin-top:10px}
+.hero{background:#111827;color:#fff}.hero .small,.hero .muted{color:#c7ccd5}.hero .pricebig{font-size:30px;font-weight:850;margin-top:3px}
+.good{background:#ecfdf5;color:#065f46}.warning{background:#fff7ed;color:#9a3412}
+footer{text-align:center;color:#9ca3af;font-size:11px;margin:18px 0}
+
+/* V3 mobile-first polish */
+body{padding-bottom:32px;-webkit-tap-highlight-color:transparent}.container{width:min(100%,760px);margin:0 auto;padding:12px}.card{border-radius:16px;padding:16px;margin-bottom:14px}h1{font-size:clamp[...]
+</style>
+</head>
+<body>
+<main>
+<h1>DCA Ladder</h1>
+<div class="sub">1/7 → 2/7 → 4/7 double-down strategy</div>
+
+<section class="card">
+<h2>Strategy setup</h2>
+<label>Asset</label><input id="asset" value="BTC" autocapitalize="characters">
+<div class="grid">
+<div><label>Free cash</label><input id="cash" type="number" inputmode="decimal" value="100000"></div>
+<div><label>Allocation %</label><input id="allocPct" type="number" inputmode="decimal" value="20"></div>
+</div>
+<div class="stat" style="margin-top:10px"><span class="small">Strategy budget</span><b id="budget">$20,000.00</b></div>
+
+<label>Reference / Entry 1 price</label><input id="refPrice" type="number" inputmode="decimal" value="100000">
+
+<label>Entry trigger method</label>
+<div class="segment">
+<button id="pctBtn" class="active" onclick="setMode('pct')">% swing</button>
+<button id="fixedBtn" onclick="setMode('fixed')">Fixed price</button>
+</div>
+
+<div id="pctFields">
+<div class="grid">
+<div><label>Entry 2 swing</label><input id="drop2" type="number" inputmode="decimal" value="10"></div>
+<div><label>Entry 3 swing</label><input id="drop3" type="number" inputmode="decimal" value="20"></div>
+</div>
+<div class="notice">Swings are measured from the reference price. Example: -10% and -20% from $100,000 gives $90,000 and $80,000.</div>
+</div>
+<div id="fixedFields" style="display:none">
+<div class="grid">
+<div><label>Entry 2 price</label><input id="fixed2" type="number" inputmode="decimal" value="90000"></div>
+<div><label>Entry 3 price</label><input id="fixed3" type="number" inputmode="decimal" value="80000"></div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<h2>Current market</h2>
+<label>Current price</label><input id="currentPrice" type="number" inputmode="decimal" value="100000">
+<div class="stat" style="margin-top:10px"><span class="small">Next action</span><b id="nextAction">Entry 1</b></div>
+</section>
+
+<section class="card">
+<h2>Trade ladder</h2>
+<div id="entries"></div>
+<div class="row" style="margin-top:13px"><span class="muted">Deployed</span><b id="deployed">$0</b></div>
+<div class="row"><span class="muted">Remaining</span><b id="remaining">$0</b></div>
+</section>
+
+<section class="card">
+<h2>Position</h2>
+<div class="grid">
+<div class="stat"><span class="small">Crypto acquired</span><b id="qty">0</b></div>
+<div class="stat"><span class="small">Average cost</span><b id="avg">$—</b></div>
+</div>
+<label>Take-profit method</label>
+<div class="segment">
+<button id="tpPctBtn" class="active" onclick="setTPMode('pct')">% from average</button>
+<button id="tpFixedBtn" onclick="setTPMode('fixed')">Fixed price</button>
+</div>
+<div id="tpPctFields"><label>Take-profit % above average cost</label><input id="tpPct" type="number" inputmode="decimal" value="25"></div>
+<div id="tpFixedFields" style="display:none"><label>Take-profit price</label><input id="tpFixed" type="number" inputmode="decimal" value="110000"></div>
+<div class="hero" style="margin-top:11px;padding:14px;border-radius:15px">
+<div class="small">Take-profit target</div>
+<div class="pricebig" id="tpTarget">$—</div>
+<div class="small" id="tpStatus">No position yet</div>
+</div>
+<div class="stat" style="margin-top:10px">
+<div class="row"><span class="muted">Position value at TP</span><b id="tpValue">$—</b></div>
+<div class="row"><span class="muted">Potential gain</span><b id="tpGain">$—</b></div>
+</div>
+</section>
+
+<section class="card">
+<button class="secondary" onclick="resetTrades()">Reset executed trades</button>
+</section>
+<footer>Manual-price prototype. Data and execution status stay in this browser on this device.</footer>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(n||0);
+const num=id=>parseFloat($(id).value)||0;
+let mode='pct', tpMode='pct';
+let executed=JSON.parse(localStorage.getItem('dcaExecutedV2')||'[false,false,false]');
+
+function setMode(m){mode=m;$('pctBtn').classList.toggle('active',m==='pct');$('fixedBtn').classList.toggle('active',m==='fixed');$('pctFields').style.display=m==='pct'?'block':'none';$('fixedFields').style.display=m==='fixed'?'block':'none';calc()}
+function setTPMode(m){tpMode=m;$('tpPctBtn').classList.toggle('active',m==='pct');$('tpFixedBtn').classList.toggle('active',m==='fixed');$('tpPctFields').style.display=m==='pct'?'block':'none';$('tpFixedFields').style.display=m==='fixed'?'block':'none';calc()}
+
+function calc(){
+ const cash=num('cash'), pct=num('allocPct'), budget=cash*pct/100, ref=num('refPrice');
+ const prices=mode==='pct'?[ref,ref*(1-num('drop2')/100),ref*(1-num('drop3')/100)]:[ref,num('fixed2'),num('fixed3')];
+ const unit=budget/7, amounts=[unit,unit*2,unit*4], asset=($('asset').value||'ASSET').toUpperCase();
+ $('budget').textContent=money(budget);
+ let deployed=0, qty=0, cost=0, html='';
+ for(let i=0;i<3;i++){
+   if(executed[i]){deployed+=amounts[i];if(prices[i]>0){qty+=amounts[i]/prices[i];cost+=amounts[i]}}
+   const next=!executed[i]&&executed.slice(0,i).every(Boolean);
+   let trigger=i===0?'Reference price':mode==='pct'?(i===1?'-'+num('drop2')+'% from reference':'-'+num('drop3')+'% from reference'):'Fixed price';
+   html+=`<div class="entry ${next?'next':''}">
+    <div class="entryhead"><b>Entry ${i+1} · ${[1,2,4][i]}/7</b><span class="badge">${executed[i]?'EXECUTED':next?'NEXT':'WAITING'}</span></div>
+    <div style="margin-top:9px" class="price">${money(prices[i])}</div>
+    <div class="small">${trigger}</div>
+    <div class="row" style="margin-top:9px"><span class="amount">${money(amounts[i])}</span><span class="muted">${asset}</span></div>
+    <div class="small">Quantity if filled: ${prices[i]>0?(amounts[i]/prices[i]).toFixed(8):'—'} ${asset}</div>
+    ${next?`<button onclick="execute(${i})">BUY / MARK ENTRY ${i+1} EXECUTED</button>`:''}
+   </div>`;
+ }
+ $('entries').innerHTML=html;
+ $('deployed').textContent=money(deployed);$('remaining').textContent=money(Math.max(0,budget-deployed));
+ const avg=qty?cost/qty:0;
+ $('qty').textContent=qty?qty.toFixed(8):'0';
+ $('avg').textContent=avg?money(avg):'$—';
+ const current=num('currentPrice');
+ let nextIdx=executed.findIndex(x=>!x);
+ if(nextIdx<0){$('nextAction').textContent='Strategy complete'}
+ else if(current<=prices[nextIdx]){$('nextAction').textContent='Entry '+(nextIdx+1)+' is ready'}
+ else $('nextAction').textContent='Wait for '+money(prices[nextIdx]);
+ let tp=0;
+ if(avg) tp=tpMode==='pct'?avg*(1+num('tpPct')/100):num('tpFixed');
+ $('tpTarget').textContent=tp?money(tp):'$—';
+ if(!avg)$('tpStatus').textContent='No position yet';
+ else if(current>=tp){$('tpStatus').textContent='Take-profit target reached';$('tpStatus').style.color='#86efac'}
+ else $('tpStatus').textContent='Current price: '+money(current)+' · '+money(Math.max(0,tp-current))+' below target';
+ if(avg&&tp){const val=qty*tp;$('tpValue').textContent=money(val);$('tpGain').textContent=money(val-cost)}
+ else{$('tpValue').textContent='$—';$('tpGain').textContent='$—'}
+}
+function execute(i){executed[i]=true;localStorage.setItem('dcaExecutedV2',JSON.stringify(executed));calc()}
+function resetTrades(){if(confirm('Reset all executed trades?')){executed=[false,false,false];localStorage.setItem('dcaExecutedV2',JSON.stringify(executed));calc()}}
+['asset','cash','allocPct','refPrice','drop2','drop3','fixed2','fixed3','currentPrice','tpPct','tpFixed'].forEach(id=>$(id).addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>
