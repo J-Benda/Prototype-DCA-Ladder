@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#111827">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>DCA Ladder</title>
+<title>DCA Ladder V4</title>
 <style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color:#111827;background:#f3f4f6}
 *{box-sizing:border-box}body{margin:0;background:#f3f4f6}main{max-width:640px;margin:auto;padding:calc(16px + env(safe-area-inset-top)) 15px calc(28px + env(safe-area-inset-bottom))}
@@ -15,20 +15,34 @@ h1{font-size:30px;margin:0 0 3px;font-weight:800}.sub{color:#6b7280;margin-botto
 h2{font-size:18px;margin:0 0 12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.triple{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 label{display:block;font-size:12px;font-weight:800;color:#6b7280;margin:11px 0 6px;text-transform:uppercase;letter-spacing:.04em}
 input,select{width:100%;font:inherit;font-size:17px;padding:12px;border:1px solid #d1d5db;border-radius:12px;background:#fff}
-.segment{display:grid;grid-template-columns:1fr 1fr;background:#eef0f2;border-radius:12px;padding:3px;margin-bottom:8px}.segment button{margin:0;background:transparent;color:#4b5563;padding:9px;font-s[...]
+.segment{display:grid;grid-template-columns:1fr 1fr;background:#eef0f2;border-radius:12px;padding:3px;margin-bottom:8px}.segment button{margin:0;background:transparent;color:#4b5563;padding:9px;font-size:14px}.segment button.active{background:#fff;color:#111827;box-shadow:0 1px 4px #00000018}
 .stat{padding:12px;border-radius:13px;background:#f3f4f6}.stat b{display:block;font-size:20px;margin-top:3px}.small{font-size:12px;color:#6b7280}
-.entry{border:1px solid #e5e7eb;border-radius:15px;padding:13px;margin:9px 0}.entry.next{border:2px solid #111827}
-.entryhead{display:flex;justify-content:space-between;align-items:center}.badge{font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:#e5e7eb}.next .badge{background:#111827;co[...]
+.entry{border:1px solid #dfe3e8;border-radius:17px;padding:16px;margin:0 0 14px;background:#fafbfc}
+.entry:last-child{margin-bottom:0}
+.entry.next{border:2px solid #111827;background:#fff}
+.entry.executed{background:#f7faf8;border-color:#d8e8de}
+.entry.waiting{background:#fafafa}
+.entryhead{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.entrytitle{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.entryaction{font-size:16px;font-weight:750;line-height:1.35;margin-top:13px}
+.entrytrigger{margin-top:5px}
+.entrydetails{margin-top:13px;padding-top:12px;border-top:1px solid #e5e7eb}
+.entrydetails .label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#6b7280}
+.entrydetails .value{font-size:18px;font-weight:800;margin-top:3px}
+.entrydetails .subvalue{font-size:13px;color:#6b7280;margin-top:3px}
+.entrybutton{margin-top:14px}
+
+.entryhead{display:flex;justify-content:space-between;align-items:center}.badge{font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:#e5e7eb}.next .badge{background:#111827;color:#fff}
 .amount{font-size:24px;font-weight:800}.price{font-size:18px;font-weight:750}
 .row{display:flex;justify-content:space-between;gap:10px;align-items:center}.muted{color:#6b7280}
-button{width:100%;border:0;border-radius:13px;padding:13px;font:inherit;font-weight:800;background:#111827;color:#fff;margin-top:9px}.secondary{background:#e5e7eb;color:#111827}.danger{background:#fee[...]
+button{width:100%;border:0;border-radius:13px;padding:13px;font:inherit;font-weight:800;background:#111827;color:#fff;margin-top:9px}.secondary{background:#e5e7eb;color:#111827}.danger{background:#fee2e2;color:#991b1b}
 .notice{padding:11px;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:12px;margin-top:10px}
 .hero{background:#111827;color:#fff}.hero .small,.hero .muted{color:#c7ccd5}.hero .pricebig{font-size:30px;font-weight:850;margin-top:3px}
 .good{background:#ecfdf5;color:#065f46}.warning{background:#fff7ed;color:#9a3412}
 footer{text-align:center;color:#9ca3af;font-size:11px;margin:18px 0}
 
 /* V3 mobile-first polish */
-body{padding-bottom:32px;-webkit-tap-highlight-color:transparent}.container{width:min(100%,760px);margin:0 auto;padding:12px}.card{border-radius:16px;padding:16px;margin-bottom:14px}h1{font-size:clamp[...]
+body{padding-bottom:32px;-webkit-tap-highlight-color:transparent}.container{width:min(100%,760px);margin:0 auto;padding:12px}.card{border-radius:16px;padding:16px;margin-bottom:14px}h1{font-size:clamp(1.65rem,7vw,2.15rem);line-height:1.05}input,select,button{min-height:52px;font-size:16px;border-radius:14px}button{font-weight:700;padding:12px 16px}.next-action{position:sticky;bottom:10px;z-index:10;padding:14px 16px;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.14)}@media(max-width:600px){.container{padding:10px}.card{padding:15px}.grid,.two,.three{grid-template-columns:1fr}.row{display:grid;grid-template-columns:1fr;gap:8px}.row button{width:100%}}@media(display-mode:standalone){body{padding-top:max(8px,env(safe-area-inset-top))}}
 </style>
 </head>
 <body>
@@ -130,14 +144,32 @@ function calc(){
  for(let i=0;i<3;i++){
    if(executed[i]){deployed+=amounts[i];if(prices[i]>0){qty+=amounts[i]/prices[i];cost+=amounts[i]}}
    const next=!executed[i]&&executed.slice(0,i).every(Boolean);
-   let trigger=i===0?'Reference price':mode==='pct'?(i===1?'-'+num('drop2')+'% from reference':'-'+num('drop3')+'% from reference'):'Fixed price';
-   html+=`<div class="entry ${next?'next':''}">
-    <div class="entryhead"><b>Entry ${i+1} · ${[1,2,4][i]}/7</b><span class="badge">${executed[i]?'EXECUTED':next?'NEXT':'WAITING'}</span></div>
-    <div style="margin-top:9px" class="price">${money(prices[i])}</div>
-    <div class="small">${trigger}</div>
-    <div class="row" style="margin-top:9px"><span class="amount">${money(amounts[i])}</span><span class="muted">${asset}</span></div>
-    <div class="small">Quantity if filled: ${prices[i]>0?(amounts[i]/prices[i]).toFixed(8):'—'} ${asset}</div>
-    ${next?`<button onclick="execute(${i})">BUY / MARK ENTRY ${i+1} EXECUTED</button>`:''}
+   const waiting=!executed[i]&&!next;
+   const ready=next && current<=prices[i];
+   let trigger=i===0?'At your reference price':mode==='pct'?(i===1?'-'+num('drop2')+'% from reference price':'-'+num('drop3')+'% from reference price'):'At the fixed price you entered';
+   let action='';
+   if(executed[i]){
+     action=`Purchased ${money(amounts[i])} of ${asset} at ${money(prices[i])}.`;
+   } else if(next && ready){
+     action=`BUY ${money(amounts[i])} of ${asset} now.`;
+   } else if(next){
+     action=`WAIT — buy ${money(amounts[i])} of ${asset} when price reaches ${money(prices[i])}.`;
+   } else {
+     action=`WAIT — complete Entry ${i} before taking this trade.`;
+   }
+   const actualQty=prices[i]>0?(amounts[i]/prices[i]).toFixed(8):'—';
+   html+=`<div class="entry ${executed[i]?'executed':next?'next':'waiting'}">
+    <div class="entryhead"><div class="entrytitle">Entry ${i+1} · ${[1,2,4][i]}/7</div><span class="badge">${executed[i]?'EXECUTED':next?(ready?'BUY NOW':'NEXT'):'WAITING'}</span></div>
+    <div class="entryaction">${action}</div>
+    <div class="small entrytrigger">${trigger} · target ${money(prices[i])}</div>
+    <div class="entrydetails">
+      <div class="grid">
+        <div><div class="label">Trade amount</div><div class="value">${money(amounts[i])}</div></div>
+        <div><div class="label">Price</div><div class="value">${money(prices[i])}</div></div>
+      </div>
+      <div style="margin-top:11px"><div class="label">${executed[i]?'Quantity purchased':'Quantity at target price'}</div><div class="value">${actualQty} ${asset}</div></div>
+    </div>
+    ${next?`<button class="entrybutton" onclick="execute(${i})">${ready?'MARK ENTRY '+(i+1)+' EXECUTED':'MARK ENTRY '+(i+1)+' EXECUTED'}</button>`:''}
    </div>`;
  }
  $('entries').innerHTML=html;
